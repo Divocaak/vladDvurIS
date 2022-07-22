@@ -141,6 +141,12 @@ if ($result = mysqli_query($link, $sql)) {
                             $cellTag .= "<td data-day='" . $day . "' data-contract-id='" . $contract["id"] . "'";
                             $entryDay = ($day < 10 ? "0" : "") . $day;
                             $entryCoords = $entryDay . ";" . $contract["id"];
+
+                            if (!isset($contSums[$contract["id"]])) {
+                                $contSums[$contract["id"]]["minutes"] = 0;
+                                $contSums[$contract["id"]]["cash"] = 0;
+                            }
+
                             if (isset($entries[$entryCoords])) {
                                 $entry = $entries[$entryCoords];
 
@@ -186,8 +192,10 @@ if ($result = mysqli_query($link, $sql)) {
                     echo '<tr><th scope="row">Sumy</th>';
                     foreach ($contSums as $contSum) {
                         $toRet = "<td>" . date('H:i', mktime(0, $contSum["minutes"])) . " (<b>" . $contSum["cash"] . " Kč</b>)";
-                        foreach ($contSum["tags"] as $key => $tag) {
-                            $toRet .= "<br>" . renderTag($tags[$key]) . " " . date('H:i', mktime(0, $tag["minutes"])) . " (<b>" . $tag["cash"] . " Kč</b>)";
+                        if (isset($contSum["tags"])) {
+                            foreach ($contSum["tags"] as $key => $tag) {
+                                $toRet .= "<br>" . renderTag($tags[$key]) . " " . date('H:i', mktime(0, $tag["minutes"])) . " (<b>" . $tag["cash"] . " Kč</b>)";
+                            }
                         }
                         echo $toRet . "</td>";
                     }
